@@ -201,7 +201,7 @@ function App() {
             <div className="header-top-content">
               <div className="logo-section">
                 <a href="#" className="logo-link">
-                  <img src={`src/img/LOGO UP.png`} alt="UP Construction Group" className="logo-img" />
+                  <img src={`https://res.cloudinary.com/daug6bxma/image/upload/v1763103958/LOGO_UP_wwkovz.png`} alt="UP Construction Group" className="logo-img" />
                 </a>
                 <h1 className="logo-text">CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h1>
               </div>
@@ -895,7 +895,7 @@ function App() {
         <div className="container">
           <div className="company-header">
             <div className="company-logo-section">
-              <img src="src/img/LOGO UP.png" alt="UP Construction Group" className="company-main-logo" />
+              <img src="https://res.cloudinary.com/daug6bxma/image/upload/v1763103958/LOGO_UP_wwkovz.png" alt="UP Construction Group" className="company-main-logo" />
               <div className="company-title-wrapper">
                 <h2 className="company-main-title">CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h2>
                 <h3 className="company-subtitle">Công ty TNHH Thương Mại Dịch Vụ Xây Dựng Ức Phát</h3>
@@ -1036,7 +1036,7 @@ function App() {
           <div className="footer-main">
             <div className="footer-brand">
               <div className="footer-logo-wrapper">
-                <img src={`src/img/LOGO UP.png`} alt="UP Construction Group" className="footer-logo" />
+                <img src={`https://res.cloudinary.com/daug6bxma/image/upload/v1763103958/LOGO_UP_wwkovz.png`} alt="UP Construction Group" className="footer-logo" />
               </div>
               <h3 className="footer-company-title">XÂY DỰNG ỨC PHÁT</h3>
               <p className="footer-company-subtitle">Công ty TNHH Thương Mại Dịch Vụ Xây Dựng Ức Phát</p>
