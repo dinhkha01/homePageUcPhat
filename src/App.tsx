@@ -244,13 +244,13 @@ function App() {
           </div>
           
           <div className="mobile-nav-links">
-            <a href="#" className="nav-link active" onClick={() => setIsMenuOpen(false)}>Trang chủ</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Giới thiệu</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dịch vụ</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dự án</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Tin tức</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Khách hàng</a>
-            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Liên hệ</a>
+            <a href="#" className="nav-link active" onClick={() => setIsMenuOpen(false)}><span>Trang chủ</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Giới thiệu</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Dịch vụ</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Dự án</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Tin tức</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Khách hàng</span></a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}><span>Liên hệ</span></a>
           </div>
           
           <div className="mobile-search">
