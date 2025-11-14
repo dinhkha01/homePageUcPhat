@@ -1,0 +1,1203 @@
+import { useState, useEffect } from 'react'
+import './App.css'
+// import logoImage from '/image.png'
+
+function App() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [hoveredPanel, setHoveredPanel] = useState<number | null>(null)
+  const [newsPage, setNewsPage] = useState(0)
+  const [isNavbarVisible, setIsNavbarVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
+  const [hoveredOffice, setHoveredOffice] = useState<string | null>(null)
+
+  // Hình ảnh cho các service panels - có thể thay thế bằng đường dẫn hình ảnh thật
+  const serviceImages = [
+    'https://i.pinimg.com/1200x/9b/d8/93/9bd8936f196534110b61f4c132d51dac.jpg', // Thiết kế kiến trúc & kết cấu
+    'https://i.pinimg.com/736x/18/d2/81/18d281280fe91a6cfa0518eb8560a14e.jpg', // Thi công nhà xưởng
+    'https://i.pinimg.com/1200x/4a/7f/d5/4a7fd560f429b02aa1a85688a0e4cd49.jpg', // Phát triển đất đai
+    'https://i.pinimg.com/1200x/be/83/46/be834690e705945bd6493ea4cd49dc66.jpg', // Quản lý xây dựng
+    'https://i.pinimg.com/736x/82/eb/2b/82eb2b41654bf59360e6bc69448c8437.jpg', // MEP & Nội thất
+  ]
+
+  // Dự án tiêu biểu
+  const projects = [
+    { id: 1, image: 'https://upgroup.com.vn/vnt_upload/project/chinh_tan/6_700x400.jpg', title: 'NHÀ XƯỞNG' },
+    { id: 2, image: 'https://upgroup.com.vn/vnt_upload/project/SLP_Binh_Minh/7.png', title: 'LOGISTICS' },
+    { id: 3, image: 'https://upgroup.com.vn/vnt_upload/project/hai_my/1.jpg', title: 'KÝ TÚC XÁ' },
+    { id: 4, image: 'https://i.pinimg.com/1200x/e5/cf/58/e5cf58423bf4f85ac36bc009d8123ff2.jpg', title: 'CAO ỐC' },
+    { id: 5, image: 'https://i.pinimg.com/1200x/d1/04/3a/d1043a737cfae2561512fe8564f44b00.jpg', title: 'CƠ ĐIỆN' },
+    { id: 6, image: 'https://i.pinimg.com/736x/bd/6e/c8/bd6ec81638dd2f4c581e44757966ea01.jpg', title: 'PHÒNG CHÁY CHỮA CHÁY' },
+  ]
+
+  // Tin tức tiêu điểm (6 thẻ nổi bật)
+  const featuredNews = [
+    { id: 1, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/le_ban_giao_SLP_Long_Hau_GD1/4.jpg', date: '13/01/2023', title: 'LỄ BÀN GIAO DỰ ÁN SLP LONG HẬU (GIAI ĐOẠN 1)' },
+    { id: 2, image: 'https://upgroup.com.vn/vnt_upload/news/CSR/Tay_Giang_Quang_Nam/12_1280.png', date: '23/11/2022', title: 'ỨC PHÁT HỖ TRỢ NHU YẾU PHẨM CHO NGƯỜI DÂN Ở THÔN ATU' },
+    { id: 3, image: 'https://upgroup.com.vn/vnt_upload/news/CSR/1.jpg', date: '10/02/2021', title: 'ỨC PHÁT BÀN GIAO NHÀ NHÂN ÁI CHO HỘ NGHÈO' },
+    { id: 4, image: 'https://upgroup.com.vn/vnt_upload/news/CSR/chua_an_lac/11.png', date: '30/11/2022', title: 'ỨC PHÁT ĐÓNG GÓP CÁC NHU YẾU PHẨM CHO CHÙA AN LẠC' },
+    { id: 5, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/9.png', date: '28/06/2021', title: 'LỄ KHỞI CÔNG CÔNG TRÌNH ADVANCED MULTITECH 2' },
+    { id: 6, image: 'https://upgroup.com.vn/vnt_upload/news/Team_building/2019/SinhTourist_CTY_UC_PHAT_TeamBuilding_GalaDinner_NHA_TRANG_2019_FULL_Moment.jpg', date: '30/11/2019', title: 'UC PHAT TEAMBUILDING GALADINNER NHA TRANG 2019' },
+  ]
+
+  // Tin tức khác (12+ thẻ)
+  const otherNews = [
+    { id: 7, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/slider.jpg', date: '15/03/2023', title: 'Dự án xây dựng nhà máy mới tại Long Thành' },
+    { id: 8, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img1.jpg', date: '20/02/2023', title: 'Ký kết hợp đồng xây dựng khu công nghiệp' },
+    { id: 9, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img3.jpg', date: '05/01/2023', title: 'Hoàn thành dự án nhà xưởng tại Bình Dương' },
+    { id: 10, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img6.jpg', date: '18/12/2022', title: 'Lễ khánh thành tòa nhà văn phòng mới' },
+    { id: 11, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img5.jpg', date: '10/12/2022', title: 'Hội thảo về công nghệ xây dựng hiện đại' },
+    { id: 12, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img2.jpg', date: '25/11/2022', title: 'Dự án cải tạo và nâng cấp hạ tầng' },
+    { id: 13, image: 'https://upgroup.com.vn/vnt_upload/news/10_2022/img4.jpg', date: '12/11/2022', title: 'Khai trương chi nhánh mới tại Hà Nội' },
+    { id: 14, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/11.png', date: '08/10/2022', title: 'Hợp tác với đối tác quốc tế về MEP' },
+    { id: 15, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/12.png', date: '20/09/2022', title: 'Dự án xây dựng trường học tại Đồng Nai' },
+    { id: 16, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/13.png', date: '15/08/2022', title: 'Lễ động thổ dự án khu dân cư mới' },
+    { id: 17, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/14.png', date: '30/07/2022', title: 'Hoàn thiện hệ thống PCCC cho nhà máy' },
+    { id: 18, image: 'https://upgroup.com.vn/vnt_upload/news/Tin_cong_ty/khoi_cong_advanced_multitech_2/15.png', date: '10/06/2022', title: 'Chứng nhận chất lượng ISO 9001:2015' },
+  ]
+
+  // Đối tác - Khách hàng (30 phần tử)
+  const partners = [
+    { id: 1, name: 'TATA', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/tata.jpg' },
+    { id: 2, name: 'Gemtek', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/quest.jpg' },
+    { id: 3, name: 'iBASE', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/_IBASE.jpg' },
+    { id: 4, name: 'ZYLUX', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_zylux.jpg' },
+    { id: 5, name: 'ASKEY', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/Askey.jpg' },
+    { id: 6, name: 'ALTOP', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_altop_1.jpg' },
+    { id: 7, name: 'Samsung', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/mitrastar.jpg' },
+    { id: 8, name: 'LG', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/niemmade.png' },
+    { id: 9, name: 'Panasonic', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/BW.png' },
+    { id: 10, name: 'Sony', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/Tripod.jpg' },
+    { id: 11, name: 'Intel', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_1.jpg' },
+    { id: 12, name: 'Microsoft', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo.gif' },
+    { id: 13, name: 'Apple', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_haimy.jpg' },
+    { id: 14, name: 'HP', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_newwide.jpg' },
+    { id: 15, name: 'Dell', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_youlin.jpg' },
+    { id: 16, name: 'Lenovo', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_2_1.jpg' },
+    { id: 17, name: 'Acer', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_5.jpg' },
+    { id: 18, name: 'Asus', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_4.jpg' },
+    { id: 19, name: 'Canon', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_3.jpg' },
+    { id: 21, name: 'Fujitsu', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_1.jpg' },
+    { id: 22, name: 'Toshiba', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo.jpg' },
+    { id: 23, name: 'Sharp', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_delicacy.jpg' },
+    { id: 24, name: 'Hitachi', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/ad_group_2.jpg' },
+    { id: 25, name: 'Mitsubishi', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/Meisheng_logo_1.jpg' },
+    { id: 26, name: 'Yamaha', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_ss_2.jpg' },
+    { id: 27, name: 'Honda', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_haimy.jpg' },
+    { id: 28, name: 'Toyota', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/logo_zylux.jpg' },
+    { id: 29, name: 'Nissan', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/Logo_V.jpg' },
+    { id: 30, name: 'Hyundai', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/slp_logo_2.jpg' },
+  ]
+
+  const newsPerPage = 6 // Show 6 items in 3x2 grid
+  const totalNewsPages = Math.ceil(otherNews.length / newsPerPage)
+  
+  // Auto-cycle for other news
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNewsPage((prev) => (prev + 1) % totalNewsPages)
+    }, 6000) // Auto cycle every 6 seconds
+
+    return () => clearInterval(timer)
+  }, [totalNewsPages])
+  
+  // Featured news now shows 1 item at a time
+  const [currentFeaturedNews, setCurrentFeaturedNews] = useState(0)
+
+  const aboutImages = [
+    'https://i.pinimg.com/736x/0f/f9/a9/0ff9a9f8e9a6cf51152613ca376f3553.jpg', // Thiết kế kiến trúc & kết cấu
+    'https://i.pinimg.com/1200x/81/cf/e1/81cfe12dc1191fae348f7063c982129d.jpg', // Thi công nhà xưởng
+    'https://i.pinimg.com/1200x/7f/bc/d4/7fbcd4788bbdd0338cec2c7c1215efa3.jpg', // Phát triển đất đai
+    'https://i.pinimg.com/1200x/71/7f/8d/717f8d79bae1e8db4abdb90bc488b186.jpg', // Quản lý xây dựng
+    'https://i.pinimg.com/736x/46/2c/25/462c250fdc6ea936b2da4d8726f6aacf.jpg', // MEP & Nội thất
+  ]
+
+  const slides = [
+    { id: 1, image: 'https://i.pinimg.com/1200x/52/99/2b/52992bae521611d8e6f3ee1502387bd5.jpg', text: 'Xây dựng Ức Phát - An toàn - Tiến độ - Hiệu quả' },
+    { id: 2, image: 'https://i.pinimg.com/1200x/ca/e2/a0/cae2a09521a908e7efadd23b33884263.jpg', text: 'Xây dựng Ức Phát - Tôn trọng môi trường' },
+    { id: 3, image: 'https://i.pinimg.com/1200x/e5/2e/80/e52e8024aa4c6d37dc7424e6cb965397.jpg', text: 'Xây dựng Ức Phát - Chất lượng - Hiệu quả' },
+    { id: 4, image: 'https://i.pinimg.com/1200x/4a/92/b1/4a92b113112c103c8a4d7129c39c4c88.jpg', text: 'Xây dựng Ức Phát - Đội ngũ nhân sự chuyên nghiệp' },
+    { id: 5, image: 'https://i.pinimg.com/1200x/62/ac/c6/62acc6067630f3c63a92063da9decf5a.jpg', text: 'Xây dựng Ức Phát - Uy tín - Chất lượng' },
+  ]
+
+  // Helper functions for project information
+  const getProjectDescription = (title: string): string => {
+    const descriptions: { [key: string]: string } = {
+      'NHÀ XƯỞNG': 'Thiết kế và thi công nhà xưởng công nghiệp hiện đại với công nghệ tiên tiến, đảm bảo chất lượng và tiến độ.',
+      'LOGISTICS': 'Phát triển hệ thống logistics và kho bãi thông minh, tối ưu hóa quy trình vận chuyển và lưu trữ hàng hóa.',
+      'KÝ TÚC XÁ': 'Xây dựng khu ký túc xá hiện đại với đầy đủ tiện nghi, tạo môi trường sống thoải mái cho sinh viên và công nhân.',
+      'CAO ỐC': 'Thiết kế và thi công các tòa nhà cao tầng với kiến trúc hiện đại, ứng dụng công nghệ xây dựng tiên tiến.',
+      'CƠ ĐIỆN': 'Lắp đặt hệ thống cơ điện chuyên nghiệp, đảm bảo an toàn và hiệu quả vận hành cho các công trình.',
+      'PHÒNG CHÁY CHỮA CHÁY': 'Thiết kế và lắp đặt hệ thống PCCC đạt chuẩn quốc tế, bảo vệ tài sản và con người một cách tối ưu.'
+    }
+    return descriptions[title] || 'Dự án chất lượng cao với công nghệ hiện đại và đội ngũ chuyên nghiệp.'
+  }
+
+  const getProjectFeatures = (title: string): string[] => {
+    const features: { [key: string]: string[] } = {
+      'NHÀ XƯỞNG': ['Kết cấu thép hiện đại', 'Hệ thống thông gió tối ưu', 'An toàn lao động cao'],
+      'LOGISTICS': ['Hệ thống tự động hóa', 'Quản lý thông minh', 'Tối ưu chi phí vận hành'],
+      'KÝ TÚC XÁ': ['Thiết kế thân thiện môi trường', 'Tiện nghi đầy đủ', 'An ninh 24/7'],
+      'CAO ỐC': ['Kiến trúc độc đáo', 'Công nghệ xanh', 'Tiết kiệm năng lượng'],
+      'CƠ ĐIỆN': ['Hệ thống điện an toàn', 'Công nghệ hiện đại', 'Bảo trì dễ dàng'],
+      'PHÒNG CHÁY CHỮA CHÁY': ['Chuẩn quốc tế', 'Phản ứng nhanh', 'Độ tin cậy cao']
+    }
+    return features[title] || ['Chất lượng cao', 'Tiến độ đảm bảo', 'Giá cả hợp lý']
+  }
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000) // Changed from 4000ms to 10000ms (10 seconds)
+
+    return () => clearInterval(timer)
+  }, [slides.length])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentFeaturedNews((prev) => (prev + 1) % featuredNews.length)
+    }, 4000) // Auto cycle every 4 seconds
+
+    return () => clearInterval(timer)
+  }, [featuredNews.length])
+
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const headerHeight = 0 // Header height
+      const carouselHeight = 0 // Height of carousel section
+      const carouselEndPosition = headerHeight + carouselHeight
+      
+      // Always show navbar when in carousel area
+      if (currentScrollY < carouselEndPosition + 1) {
+        setIsNavbarVisible(true)
+      }
+      // Hide navbar when scrolling DOWN past carousel
+      else if (currentScrollY > lastScrollY && currentScrollY > carouselEndPosition + 80) {
+        setIsNavbarVisible(false)
+      } 
+      // Show navbar when scrolling UP
+      else if (currentScrollY < lastScrollY) {
+        setIsNavbarVisible(true)
+      }
+      
+      setLastScrollY(currentScrollY)
+    }
+    
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
+
+  
+
+  return (
+    
+    <div className="app">
+      {/* Header */}
+      <header className={`header ${isNavbarVisible ? 'navbar-visible' : 'navbar-hidden'}`}>
+        <div className="header-top">
+          <div className="container">
+            <div className="header-top-content">
+              <div className="logo-section">
+                <a href="#" className="logo-link">
+                  <img src={`src/img/LOGO UP.png`} alt="UP Construction Group" className="logo-img" />
+                </a>
+                <h1 className="logo-text">CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h1>
+              </div>
+              <div className="header-actions">
+                <div className="language-switcher">
+                  <a href="#" className="lang-link active"><span>VN</span></a>
+                  <span className="separator">|</span>
+                  <a href="#" className="lang-link"><span>繁體</span></a>
+                </div>
+                <div className="search-box">
+                  <input type="text" placeholder="Nhập từ khóa" className="search-input" />
+                  <button className="search-btn">TÌM KIẾM</button>
+                </div>
+                <button 
+                  className={`mobile-menu-toggle ${isMenuOpen ? 'active' : ''}`}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile Navigation */}
+        <div className={`mobile-nav ${isMenuOpen ? 'active' : ''}`}>
+          <div className="mobile-nav-header">
+            <h3 className="mobile-nav-title">Menu</h3>
+            <button 
+              className="mobile-nav-close"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          
+          <div className="mobile-nav-links">
+            <a href="#" className="nav-link active" onClick={() => setIsMenuOpen(false)}>Trang chủ</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Giới thiệu</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dịch vụ</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Dự án</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Tin tức</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Khách hàng</a>
+            <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Liên hệ</a>
+          </div>
+          
+          <div className="mobile-search">
+            <div className="search-box">
+              <input type="text" placeholder="Nhập từ khóa" className="search-input" />
+              <button className="search-btn">TÌM KIẾM</button>
+            </div>
+          </div>
+          
+          <div className="mobile-cta">
+            <a href="#" className="cta-button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              Liên hệ ngay
+            </a>
+          </div>
+        </div>
+        
+        <nav className="navbar mobile-hidden">
+          <div className="container">
+            <ul className="nav-menu">
+              <li><a href="#" className="nav-link active"><span>Trang chủ</span></a></li>
+              <li className="has-dropdown">
+                <a href="#" className="nav-link"><span>Giới thiệu</span></a>
+              </li>
+              <li className="has-dropdown">
+                <a href="#" className="nav-link"><span>Dịch vụ</span></a>
+                <ul className="dropdown-menu">
+                  <li><a href="#"><span>Thiết kế kiến trúc & kết cấu</span></a></li>
+                  <li><a href="#"><span>Thi công nhà xưởng</span></a></li>
+                  <li><a href="#"><span>Phát triển đất đai</span></a></li>
+                  <li><a href="#"><span>Quản lý xây dựng</span></a></li>
+                  <li><a href="#"><span>MEP & Nội thất (cơ điện, PCCC, nội thất)</span></a></li>
+                </ul>
+              </li>
+              <li><a href="#" className="nav-link"><span>Dự án</span></a></li>
+              <li><a href="#" className="nav-link"><span>Tin tức</span></a></li>
+              <li><a href="#" className="nav-link"><span>Khách hàng</span></a></li>
+              <li><a href="#" className="nav-link"><span>Liên hệ</span></a></li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+
+      {/* Banner Carousel */}
+      <section className="banner-section">
+        <div className="banner-carousel">
+          {slides.map((slide, index) => {
+            // Alternate between different Ken Burns effects for variety
+            const kenBurnsEffect = index % 3 === 0 ? 'ken-burns' : 
+                                 index % 3 === 1 ? 'ken-burns-left' : 'ken-burns-right';
+            
+            return (
+              <div
+                key={slide.id}
+                className={`banner-slide ${index === currentSlide ? 'active' : ''} ${index === currentSlide ? kenBurnsEffect : ''}`}
+                style={{
+                  backgroundImage: `url(${slide.image})`
+                }}
+              >
+                <div className="banner-overlay"></div>
+                <div className="banner-content">
+                  <h2 className="banner-title">{slide.text}</h2>
+                </div>
+              </div>
+            );
+          })}
+          
+          {/* Progress indicator */}
+          <div className="slide-progress">
+            <div 
+              className={`progress-bar ${currentSlide >= 0 ? 'active' : ''}`}
+              key={currentSlide}
+              style={{
+                animationDuration: '5s'
+              }}
+            ></div>
+          </div>
+        </div>
+        
+        <div className="banner-dots">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentSlide ? 'active' : ''}`}
+              onClick={() => setCurrentSlide(index)}
+            >
+              <span className="dot-progress"></span>
+            </button>
+          ))}
+        </div>
+        
+        <button className="banner-prev" onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+        </button>
+        <button className="banner-next" onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="9,18 15,12 9,6"></polyline>
+          </svg>
+        </button>
+      </section>
+
+      {/* About Us Section */}
+      <section className="about-section">
+        <div className="container">
+          <div className="about-content">
+            <div className="about-left">
+              <div className="about-greeting">
+                <span>Chào mừng đến với</span>
+                <div className="greeting-line"></div>
+              </div>
+              <h2 className="about-title">XÂY DỰNG ỨC PHÁT</h2>
+              <p className="about-description">
+                Công ty TM DV Xây dựng Ức Phát được thành lập năm 2012, có kinh nghiệm trong việc xây dựng các loại nhà xưởng như: 
+                dệt may, điện tử, lốp xe, dầu khí, hóa chất, da giày, giấy, sơn, xe đạp, dụng cụ thể thao, cơ khí chế tạo, 
+                khuôn sắt, ốc vít... Ngoài ra còn có kinh nghiệm trong việc xây dựng nhà cao tầng, M&E, PCCC, các dự án môi trường 
+                và các dịch vụ pháp lý liên quan (môi trường, PCCC, giấy phép, nghiệm thu công trình). Trong những năm gần đây, 
+                doanh thu trung bình hàng năm đều vượt quá 40,000,000 USD, xếp hạng trong số các công ty xây dựng hàng đầu tại Đài Loan.
+              </p>
+              <a href="#" className="learn-more-btn">
+                Tìm hiểu thêm <span className="arrow">›</span>
+              </a>
+            </div>
+            
+            <div className="about-right">
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <div className="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 3v18h18" />
+                      <path d="M7 12l4-4 4 4 6-6" />
+                    </svg>
+                  </div>
+                  <div className="stat-number">+ 12 năm</div>
+                  <div className="stat-label">Hình thành và phát triển</div>
+                </div>
+                
+                <div className="stat-item">
+                  <div className="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </div>
+                  <div className="stat-number">+ 3.000 người</div>
+                  <div className="stat-label">Đội ngũ nhân sự</div>
+                </div>
+                
+                <div className="stat-item">
+                  <div className="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                  </div>
+                  <div className="stat-number">+ 150</div>
+                  <div className="stat-label">Dự án hoàn thành</div>
+                </div>
+                
+                <div className="stat-item">
+                  <div className="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      <circle cx="18" cy="8" r="2" />
+                    </svg>
+                  </div>
+                  <div className="stat-number">+ 200</div>
+                  <div className="stat-label">Đối tác khách hàng</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Cards Section */}
+      <section className="services-cards-section">
+        <div className="services-cards-container">
+          <a href="#" className="service-card">
+            <div className="card-background" style={{
+              backgroundImage: `url(${aboutImages[0]})`
+            }}>
+              <div className="card-overlay"></div>
+              <div className="card-play-icon">
+                <svg viewBox="0 0 24 24" fill="white">
+                  <circle cx="12" cy="12" r="10" fill="rgba(0,0,0,0.5)"/>
+                  <path d="M10 8l6 4-6 4V8z" fill="white"/>
+                </svg>
+              </div>
+            </div>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="10" r="1.5" fill="white"/>
+                <line x1="12" y1="12" x2="12" y2="16" stroke="white" strokeWidth="2"/>
+              </svg>
+            </div>
+            <div className="card-title">VỀ ỨC PHÁT</div>
+          </a>
+
+          <a href="#" className="service-card">
+            <div className="card-background" style={{
+              backgroundImage: `url(${aboutImages[1]})`
+            }}>
+              <div className="card-overlay"></div>
+            </div>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <circle cx="12" cy="12" r="1.5" fill="white"/>
+                <line x1="12" y1="14" x2="12" y2="18" stroke="white" strokeWidth="2"/>
+              </svg>
+            </div>
+            <div className="card-title">THÔNG ĐIỆP CÔNG TY</div>
+          </a>
+
+          <a href="#" className="service-card">
+            <div className="card-background" style={{
+              backgroundImage: `url(${aboutImages[  2]})`
+            }}>
+              <div className="card-overlay"></div>
+            </div>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div className="card-title">SƠ ĐỒ TỔ CHỨC</div>
+          </a>
+
+          <a href="#" className="service-card">
+            <div className="card-background" style={{
+              backgroundImage: `url(${aboutImages[3]})`
+            }}>
+              <div className="card-overlay"></div>
+            </div>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                <path d="M8 10l2 2 4-4" stroke="white" strokeWidth="2" fill="none"/>
+                <path d="M16 10l2 2 4-4" stroke="white" strokeWidth="2" fill="none"/>
+              </svg>
+            </div>
+            <div className="card-title">THÀNH TỰU</div>
+          </a>
+
+          <a href="#" className="service-card">
+            <div className="card-background" style={{
+              backgroundImage: `url(${aboutImages[4]})`
+            }}>
+              <div className="card-overlay"></div>
+            </div>
+            <div className="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M9 15l2 2 4-4"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div className="card-title">HỒ SƠ NĂNG LỰC</div>
+          </a>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="services-section">
+        <div className="container">
+          <div className="services-header">
+            <div className="services-header-left">
+              <h2 className="services-title">
+                Dịch Vụ
+                <span className="title-line"></span>
+              </h2>
+              <p className="services-description">
+                Chúng tôi cam kết tạo ra môi trường sống đẹp, nhà xưởng chất lượng và trải nghiệm tốt nhất cho nhân viên, 
+                luôn đặt sự hài lòng của khách hàng lên hàng đầu.
+        </p>
+      </div>
+            <a href="#" className="view-all-btn">
+              Xem tất cả <span className="arrow">›</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Services Visual Panels */}
+        <div className="services-panels-container">
+          <a 
+            href="#" 
+            className={`service-panel ${hoveredPanel === 0 ? 'active' : ''}`}
+            onMouseEnter={() => setHoveredPanel(0)}
+            onMouseLeave={() => setHoveredPanel(null)}
+          >
+            <div className="panel-background" style={{
+              backgroundImage: `url(${serviceImages[0] || 'https://via.placeholder.com/400x600/3b82f6/ffffff?text=Thiết+kế+Kiến+trúc'})`
+            }}>
+              <div className="panel-overlay"></div>
+            </div>
+            <div className="panel-content">
+              <h3 className="panel-title">Thiết kế Kiến trúc</h3>
+              <p className="panel-description">Dịch vụ thiết kế kiến trúc và kết cấu chuyên nghiệp với đội ngũ kỹ sư giàu kinh nghiệm.</p>
+              <ul className="panel-features">
+                <li>Thiết kế kiến trúc công nghiệp</li>
+                <li>Tính toán kết cấu chính xác</li>
+                <li>Bản vẽ kỹ thuật chi tiết</li>
+              </ul>
+            </div>
+            <div className="panel-nav-content" data-number="01">
+              <span className="panel-nav-text">Thiết kế kiến trúc & kết cấu</span>
+            </div>
+          </a>
+
+          <a 
+            href="#" 
+            className={`service-panel ${hoveredPanel === 1 ? 'active' : ''}`}
+            onMouseEnter={() => setHoveredPanel(1)}
+            onMouseLeave={() => setHoveredPanel(null)}
+          >
+            <div className="panel-background" style={{
+              backgroundImage: `url(${serviceImages[1] || 'https://via.placeholder.com/400x600/8b5cf6/ffffff?text=Thi+công+Nhà+xưởng'})`
+            }}>
+              <div className="panel-overlay"></div>
+            </div>
+            <div className="panel-content">
+              <h3 className="panel-title">Thi công Nhà xưởng</h3>
+              <p className="panel-description">Thi công nhà xưởng công nghiệp và nhà cao tầng với tiến độ nhanh, chất lượng cao.</p>
+              <ul className="panel-features">
+                <li>Nhà xưởng công nghiệp</li>
+                <li>Nhà cao tầng hiện đại</li>
+                <li>Đảm bảo tiến độ & chất lượng</li>
+              </ul>
+            </div>
+            <div className="panel-nav-content" data-number="02">
+              <span className="panel-nav-text">Thi công nhà xưởng</span>
+            </div>
+          </a>
+
+          <a 
+            href="#" 
+            className={`service-panel ${hoveredPanel === 2 ? 'active' : ''}`}
+            onMouseEnter={() => setHoveredPanel(2)}
+            onMouseLeave={() => setHoveredPanel(null)}
+          >
+            <div className="panel-background" style={{
+              backgroundImage: `url(${serviceImages[2] || 'https://via.placeholder.com/400x600/ec4899/ffffff?text=Phát+triển+Đất+đai'})`
+            }}>
+              <div className="panel-overlay"></div>
+            </div>
+            <div className="panel-content">
+              <h3 className="panel-title">Phát triển Đất đai</h3>
+              <p className="panel-description">Dịch vụ phát triển và quy hoạch đất đai cho các dự án công nghiệp và dân dụng.</p>
+              <ul className="panel-features">
+                <li>Quy hoạch tổng thể</li>
+                <li>Phát triển khu công nghiệp</li>
+                <li>Tư vấn đầu tư đất đai</li>
+              </ul>
+            </div>
+            <div className="panel-nav-content" data-number="03">
+              <span className="panel-nav-text">Phát triển đất đai</span>
+            </div>
+          </a>
+
+          <a 
+            href="#" 
+            className={`service-panel ${hoveredPanel === 3 ? 'active' : ''}`}
+            onMouseEnter={() => setHoveredPanel(3)}
+            onMouseLeave={() => setHoveredPanel(null)}
+          >
+            <div className="panel-background" style={{
+              backgroundImage: `url(${serviceImages[3] || 'https://via.placeholder.com/400x600/f59e0b/ffffff?text=Quản+lý+Xây+dựng'})`
+            }}>
+              <div className="panel-overlay"></div>
+            </div>
+            <div className="panel-content">
+              <h3 className="panel-title">Quản lý Xây dựng</h3>
+              <p className="panel-description">Dịch vụ quản lý dự án xây dựng toàn diện từ khởi công đến bàn giao.</p>
+              <ul className="panel-features">
+                <li>Quản lý tiến độ dự án</li>
+                <li>Kiểm soát chất lượng</li>
+                <li>Giám sát an toàn lao động</li>
+              </ul>
+            </div>
+            <div className="panel-nav-content" data-number="04">
+              <span className="panel-nav-text">Quản lý xây dựng</span>
+            </div>
+          </a>
+
+          <a 
+            href="#" 
+            className={`service-panel ${hoveredPanel === 4 ? 'active' : ''}`}
+            onMouseEnter={() => setHoveredPanel(4)}
+            onMouseLeave={() => setHoveredPanel(null)}
+          >
+            <div className="panel-background" style={{
+              backgroundImage: `url(${serviceImages[4] || 'https://via.placeholder.com/400x600/10b981/ffffff?text=MEP+%26+Nội+thất'})`
+            }}>
+              <div className="panel-overlay"></div>
+            </div>
+            <div className="panel-content">
+              <h3 className="panel-title">MEP & Nội thất</h3>
+              <p className="panel-description">Hệ thống cơ điện, phòng cháy chữa cháy và thiết kế nội thất chuyên nghiệp.</p>
+              <ul className="panel-features">
+                <li>Hệ thống cơ điện (MEP)</li>
+                <li>Phòng cháy chữa cháy (PCCC)</li>
+                <li>Thiết kế nội thất hiện đại</li>
+              </ul>
+            </div>
+            <div className="panel-nav-content" data-number="05">
+              <span className="panel-nav-text">MEP & Nội thất</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      {/* Projects Section */}
+      <section className="projects-section">
+        <div className="container">
+          <div className="projects-header">
+            <div className="projects-header-left">
+              <h2 className="projects-title">
+                Dự Án Tiêu Biểu
+                <span className="projects-title-line"></span>
+              </h2>
+              <p className="projects-description">
+                Chúng tôi có kinh nghiệm trong các lĩnh vực dân dụng, công nghiệp, xây dựng nhà xưởng, cơ điện, 
+                hạ tầng kỹ thuật, hệ thống phòng cháy chữa cháy (PCCC). Với cơ sở vật chất mạnh, trang thiết bị hiện đại, 
+                phát triển chiến lược, chúng tôi đã xây dựng được uy tín và trở thành lựa chọn hàng đầu của khách hàng 
+                tại khu vực miền Nam và trên toàn quốc.
+              </p>
+            </div>
+            <a href="#" className="view-all-projects-btn">
+              Xem tất cả <span className="arrow">›</span>
+            </a>
+          </div>
+        </div>
+
+        <div className="projects-grid">
+          {projects.map((project, index) => (
+            <a key={project.id} href="#" className="project-card">
+              <div className="project-image-wrapper">
+                <div 
+                  className="project-image" 
+                  style={{
+                    backgroundImage: `url(${project.image || 'https://via.placeholder.com/600x400/4a90e2/ffffff?text=' + project.title})`
+                  }}
+                >
+                  <div className="project-overlay"></div>
+                </div>
+                
+                {/* Project content that appears on hover */}
+                <div className="project-content">
+                  <h3 className="project-title">{project.title}</h3>
+                  <p className="project-description">
+                    {getProjectDescription(project.title)}
+                  </p>
+                  <ul className="project-features">
+                    {getProjectFeatures(project.title).map((feature, idx) => (
+                      <li key={idx}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Project number badge */}
+                <div className="project-number">{String(index + 1).padStart(2, '0')}</div>
+                
+                {/* Default label (hidden on hover) */}
+                <div className="project-label">{project.title}</div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section className="news-section">
+        <div className="container">
+          <div className="news-header">
+            <h2 className="news-title">
+              Tin Tức Tiêu Điểm
+              <span className="news-title-line"></span>
+            </h2>
+            <a href="#" className="view-all-news-btn">
+              Xem tất cả <span className="arrow">›</span>
+            </a>
+          </div>
+
+          {/* Featured News - Single Item Carousel */}
+          <div className="featured-news-section">
+            <div className="featured-news-container">
+              <div className="featured-news-single">
+                <a href="#" className="featured-news-card active">
+                  <div className="news-image-wrapper">
+                    <div 
+                      className="news-image" 
+                      style={{
+                        backgroundImage: `url(${featuredNews[currentFeaturedNews]?.image || 'https://via.placeholder.com/600x300/4a90e2/ffffff?text=' + featuredNews[currentFeaturedNews]?.title})`
+                      }}
+                    >
+                      <div className="news-overlay"></div>
+                    </div>
+                  </div>
+                  <div className="news-content">
+                    <div className="news-date">{featuredNews[currentFeaturedNews]?.date}</div>
+                    <h3 className="news-title-text">{featuredNews[currentFeaturedNews]?.title}</h3>
+                  </div>
+                </a>
+              </div>
+            </div>
+            
+            {/* Featured News Dots */}
+            <div className="featured-news-dots">
+              {featuredNews.map((_, index) => (
+                <button
+                  key={index}
+                  className={`featured-news-dot ${index === currentFeaturedNews ? 'active' : ''}`}
+                  onClick={() => setCurrentFeaturedNews(index)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Other News - 3x2 Grid Carousel */}
+          <div className="other-news-section">
+            <div className="other-news-container">
+              <div 
+                className="other-news-carousel"
+                style={{
+                  transform: `translateX(-${newsPage * 100}%)`
+                }}
+              >
+                {Array.from({ length: totalNewsPages }).map((_, pageIndex) => (
+                  <div key={pageIndex} className="other-news-page">
+                    {otherNews
+                      .slice(pageIndex * newsPerPage, (pageIndex + 1) * newsPerPage)
+                      .map((news) => (
+                        <a key={news.id} href="#" className="other-news-card">
+                          <div className="news-image-wrapper">
+                            <div 
+                              className="news-image" 
+                              style={{
+                                backgroundImage: `url(${news.image || 'https://via.placeholder.com/300x180/4a90e2/ffffff?text=' + news.title})`
+                              }}
+                            >
+                              <div className="news-overlay"></div>
+                            </div>
+                          </div>
+                          <div className="news-content">
+                            <div className="news-date">{news.date}</div>
+                            <h3 className="news-title-text">{news.title}</h3>
+                          </div>
+                        </a>
+                      ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <div className="news-navigation">
+              <button 
+                className="news-nav-btn" 
+                onClick={() => setNewsPage((prev) => (prev - 1 + totalNewsPages) % totalNewsPages)}
+                disabled={totalNewsPages <= 1}
+              >
+                ‹
+              </button>
+              
+              <div className="news-dots">
+                {Array.from({ length: totalNewsPages }).map((_, index) => (
+                  <button
+                    key={index}
+                    className={`news-dot ${index === newsPage ? 'active' : ''}`}
+                    onClick={() => setNewsPage(index)}
+                  />
+                ))}
+              </div>
+              
+              <button 
+                className="news-nav-btn" 
+                onClick={() => setNewsPage((prev) => (prev + 1) % totalNewsPages)}
+                disabled={totalNewsPages <= 1}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="partners-section">
+        <div className="container">
+          <div className="partners-header">
+            <h2 className="partners-title">
+              Đối Tác - Khách Hàng
+              <span className="partners-title-line"></span>
+            </h2>
+          </div>
+          <div className="partners-carousel-wrapper">
+            <div className="partners-carousel">
+              {/* Render partners twice for seamless loop */}
+              {[...partners, ...partners].map((partner, index) => (
+                <div key={`${partner.id}-${index}`} className="partner-item">
+                  <div className="partner-logo-wrapper">
+                    <img 
+                      src={partner.logo} 
+                      alt={partner.name} 
+                      className="partner-logo"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Company Info Section */}
+      <section className="company-info-section">
+        <div className="company-info-background">
+          <div className="floating-shapes">
+            <div className="shape shape-1"></div>
+            <div className="shape shape-2"></div>
+            <div className="shape shape-3"></div>
+          </div>
+        </div>
+        
+        <div className="container">
+          <div className="company-header">
+            <div className="company-logo-section">
+              <img src="src/img/LOGO UP.png" alt="UP Construction Group" className="company-main-logo" />
+              <div className="company-title-wrapper">
+                <h2 className="company-main-title">CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h2>
+                <h3 className="company-subtitle">Công ty TNHH Thương Mại Dịch Vụ Xây Dựng Ức Phát</h3>
+                <div className="company-tagline">Xây dựng tương lai - Kết nối thành công</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="offices-section">
+            <h3 className="offices-title">Hệ thống văn phòng</h3>
+            <div className="offices-grid">
+              {/* Trụ sở chính */}
+              <div 
+                className={`office-card ${hoveredOffice === 'main' ? 'active' : ''}`}
+                onMouseEnter={() => setHoveredOffice('main')}
+                onMouseLeave={() => setHoveredOffice(null)}
+              >
+                <div className="office-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div className="office-content">
+                  <h4>Trụ sở chính</h4>
+                  <p>Tổ 7, hẻm 789, quốc lộ 51b, X.Long Thành, T.Đồng Nai</p>
+                  <div className="office-badge">Headquarters</div>
+                </div>
+                <div className="office-map">
+                  <div className="office-map-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Vị trí trụ sở chính - Đồng Nai
+                  </div>
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18290.19100537223!2d106.94762343132435!3d10.786275109614783!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31751ed60050cf21%3A0x1d41bb6cb68c7794!2zQ8O0bmcgdHkgVE5ISCBUaMawxqFuZyBN4bqhaSBE4buLY2ggVuG7pSBYw6J5IEThu7FuZyDhu6hjIFBow6F0!5e1!3m2!1svi!2s!4v1763085204921!5m2!1svi!2s" 
+                    width="100%" 
+                    height="300" 
+                    style={{border: 0}} 
+                    allowFullScreen 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Chi nhánh TP.HCM */}
+              <div 
+                className={`office-card ${hoveredOffice === 'hcm' ? 'active' : ''}`}
+                onMouseEnter={() => setHoveredOffice('hcm')}
+                onMouseLeave={() => setHoveredOffice(null)}
+              >
+                <div className="office-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div className="office-content">
+                  <h4>Miền Nam – Chi nhánh TP.HCM</h4>
+                  <p>The Signature - M7, Đường số 15, P.Tân Mỹ, Q.7, Thành phố Hồ Chí Minh</p>
+                  <div className="office-badge">Southern Branch</div>
+                </div>
+                <div className="office-map">
+                  <div className="office-map-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Vị trí chi nhánh - TP. Hồ Chí Minh
+                  </div>
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1963.9163411375348!2d106.72685134913263!3d10.724017689377543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175252f80cab671%3A0x90e87a2c2eea763a!2sMidtown%20M7%20The%20Signature!5e1!3m2!1svi!2s!4v1763085367962!5m2!1svi!2s" 
+                    width="100%" 
+                    height="300" 
+                    style={{border: 0}} 
+                    allowFullScreen 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+              </div>
+
+              {/* Chi nhánh Hà Nội */}
+              <div 
+                className={`office-card ${hoveredOffice === 'hanoi' ? 'active' : ''}`}
+                onMouseEnter={() => setHoveredOffice('hanoi')}
+                onMouseLeave={() => setHoveredOffice(null)}
+              >
+                <div className="office-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                </div>
+                <div className="office-content">
+                  <h4>Miền Bắc - Chi nhánh Hà Nội</h4>
+                  <p>Số 25, Lê Văn Lương, phường Nhân Chính, Quận Thanh Xuân Tầng 3, D01-31, BRG Diamond Residence</p>
+                  <div className="office-badge">Northern Branch</div>
+                </div>
+                <div className="office-map">
+                  <div className="office-map-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    Vị trí chi nhánh - Hà Nội
+                  </div>
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4345.459953756712!2d105.80285421142773!3d21.00546228055734!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135adfd2a330e79%3A0x9917e9153e4bab51!2zVGhlIERpYW1vbmQgUmVzaWRlbmNlIC0gMjUgTMOqIFbEg24gTMawxqFuZw!5e1!3m2!1svi!2s!4v1763085424942!5m2!1svi!2s" 
+                    width="100%" 
+                    height="300" 
+                    style={{border: 0}} 
+                    allowFullScreen 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-background">
+          <div className="footer-shapes">
+            <div className="footer-shape footer-shape-1"></div>
+            <div className="footer-shape footer-shape-2"></div>
+            <div className="footer-shape footer-shape-3"></div>
+          </div>
+        </div>
+        
+        <div className="container">
+          <div className="footer-main">
+            <div className="footer-brand">
+              <div className="footer-logo-wrapper">
+                <img src={`src/img/LOGO UP.png`} alt="UP Construction Group" className="footer-logo" />
+              </div>
+              <h3 className="footer-company-title">XÂY DỰNG ỨC PHÁT</h3>
+              <p className="footer-company-subtitle">Công ty TNHH Thương Mại Dịch Vụ Xây Dựng Ức Phát</p>
+              <p className="footer-tagline">Xây dựng tương lai - Kết nối thành công</p>
+              
+              <div className="footer-social">
+                <a href="#" className="social-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                  </svg>
+                </a>
+                <a href="#" className="social-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                  </svg>
+                </a>
+                <a href="#" className="social-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a href="#" className="social-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+            
+            <div className="footer-links">
+              <div className="footer-column">
+                <h4 className="footer-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9,22 9,12 15,12 15,22"/>
+                  </svg>
+                  Về chúng tôi
+                </h4>
+                <ul className="footer-list">
+                  <li><a href="#">Giới thiệu công ty</a></li>
+                  <li><a href="#">Lịch sử hình thành</a></li>
+                  <li><a href="#">Tầm nhìn & sứ mệnh</a></li>
+                  <li><a href="#">Giá trị cốt lõi</a></li>
+                  <li><a href="#">Thành tựu nổi bật</a></li>
+                </ul>
+              </div>
+              
+              <div className="footer-column">
+                <h4 className="footer-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                  </svg>
+                  Dịch vụ
+                </h4>
+                <ul className="footer-list">
+                  <li><a href="#">Thiết kế kiến trúc</a></li>
+                  <li><a href="#">Thi công xây dựng</a></li>
+                  <li><a href="#">Phát triển đất đai</a></li>
+                  <li><a href="#">Quản lý dự án</a></li>
+                  <li><a href="#">Hệ thống MEP & PCCC</a></li>
+                </ul>
+              </div>
+              
+              <div className="footer-column">
+                <h4 className="footer-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                  </svg>
+                  Dự án
+                </h4>
+                <ul className="footer-list">
+                  <li><a href="#">Nhà xưởng công nghiệp</a></li>
+                  <li><a href="#">Trung tâm logistics</a></li>
+                  <li><a href="#">Cao ốc văn phòng</a></li>
+                  <li><a href="#">Ký túc xá hiện đại</a></li>
+                  <li><a href="#">Hệ thống PCCC</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="footer-contact">
+              <h4 className="footer-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Liên hệ ngay
+              </h4>
+              
+              <div className="contact-info">
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                  </div>
+                  <div className="contact-details">
+                    <span className="contact-label">Trụ sở chính</span>
+                    <span className="contact-value">Tổ 7, hẻm 789, quốc lộ 51b<br/>X.Long Thành, T.Đồng Nai</span>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                  </div>
+                  <div className="contact-details">
+                    <span className="contact-label">Hotline 24/7</span>
+                    <span className="contact-value">0251 3844 313</span>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <div className="contact-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                  </div>
+                  <div className="contact-details">
+                    <span className="contact-label">Email hỗ trợ</span>
+                    <span className="contact-value">info@upgroup.com.vn</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="footer-cta">
+                <a href="#" className="cta-button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  Gọi ngay để tư vấn miễn phí
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <div className="footer-bottom">
+            <div className="footer-bottom-content">
+              <div className="footer-copyright">
+                <p>© 2024 <strong>XÂY DỰNG ỨC PHÁT</strong> - Tất cả quyền được bảo lưu</p>
+              </div>
+              <div className="footer-policies">
+                <a href="#">Chính sách bảo mật</a>
+                <span className="separator">|</span>
+                <a href="#">Điều khoản sử dụng</a>
+                <span className="separator">|</span>
+                <a href="#">Sitemap</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  )
+}
+
+export default App
