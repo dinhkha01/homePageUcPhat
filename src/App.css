@@ -2649,17 +2649,17 @@
 .news-title {
   font-size: 48px;
   font-weight: 700;
-  background: linear-gradient(135deg, #1960bf 0%, #145f7f 50%, #1960bf 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ffffff;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 15px;
   line-height: 1.2;
   letter-spacing: -0.5px;
-  text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 255, 255, 0.1);
   position: relative;
 }
 
@@ -3422,16 +3422,33 @@
 }
 
 .partners-carousel-wrapper {
-  overflow: hidden;
+  overflow-x: scroll;
+  overflow-y: hidden;
   width: 100%;
   position: relative;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.partners-carousel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.partners-carousel-wrapper:active {
+  cursor: grabbing;
 }
 
 .partners-carousel {
   display: flex;
   gap: 30px;
   width: fit-content;
-  animation: infiniteScroll 90s linear infinite;
+  animation: infiniteScroll 150s linear infinite;
+}
+
+.partners-carousel-wrapper:hover .partners-carousel {
+  animation-play-state: paused;
 }
 
 @keyframes infiniteScroll {
@@ -4503,33 +4520,160 @@
   }
 }
 
+/* Ẩn footer-social-mobile trên desktop */
+.footer-social-mobile {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .footer {
-    padding: 60px 0 0;
+    padding: 40px 0 0;
   }
   
   .footer-main {
-    gap: 40px;
+    grid-template-columns: 1fr;
+    gap: 25px;
   }
   
+  /* Ẩn phần links trên mobile */
   .footer-links {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    display: none;
+  }
+  
+  /* Giữ logo và contact, căn giữa */
+  .footer-brand {
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .footer-brand .footer-logo-wrapper {
+    padding: 15px;
+  }
+  
+  .footer-brand .footer-logo {
+    height: 60px;
+  }
+  
+  .footer-brand .footer-company-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .footer-brand .footer-company-subtitle {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  .footer-brand .footer-tagline {
+    font-size: 12px;
+  }
+  
+  .footer-contact {
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .footer-contact .footer-title {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  .footer-contact .contact-info {
+    gap: 15px;
+  }
+  
+  .footer-contact .contact-item {
+    padding: 12px;
+  }
+  
+  .footer-contact .contact-icon {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .footer-contact .contact-label {
+    font-size: 12px;
+  }
+  
+  .footer-contact .contact-value {
+    font-size: 13px;
+  }
+  
+  .footer-cta {
+    margin-top: 5px;
+  }
+  
+  /* Chuyển social media ra khỏi footer-brand */
+  .footer-brand .footer-social {
+    display: none;
+  }
+  
+  .footer-bottom {
+    padding: 20px 0;
   }
   
   .footer-bottom-content {
     flex-direction: column;
     text-align: center;
-    gap: 15px;
+    gap: 10px;
   }
   
-  .footer-social {
+  .footer-copyright p {
+    font-size: 12px;
+  }
+  
+  .footer-policies {
+    gap: 10px;
+  }
+  
+  .footer-policies a {
+    font-size: 11px;
+  }
+  
+  /* Hiển thị social media dưới copyright trên mobile */
+  .footer-social-mobile {
+    display: flex;
     justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .footer-social-mobile .social-link {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .footer-social-mobile .social-link:hover {
+    background: linear-gradient(135deg, #1960bf, #145f7f);
+    border-color: #06b6d4;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(6, 182, 212, 0.3);
+  }
+  
+  .footer-social-mobile .social-link svg {
+    width: 18px;
+    height: 18px;
   }
   
   .cta-button {
     width: 100%;
     justify-content: center;
+    padding: 14px 20px;
+    font-size: 14px;
   }
 }
 
