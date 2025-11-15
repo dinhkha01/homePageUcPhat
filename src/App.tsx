@@ -13,11 +13,11 @@ function App() {
 
   // Hình ảnh cho các service panels - có thể thay thế bằng đường dẫn hình ảnh thật
   const serviceImages = [
-    'https://i.pinimg.com/1200x/9b/d8/93/9bd8936f196534110b61f4c132d51dac.jpg', // Thiết kế kiến trúc & kết cấu
-    'https://i.pinimg.com/736x/18/d2/81/18d281280fe91a6cfa0518eb8560a14e.jpg', // Thi công nhà xưởng
-    'https://i.pinimg.com/1200x/4a/7f/d5/4a7fd560f429b02aa1a85688a0e4cd49.jpg', // Phát triển đất đai
-    'https://i.pinimg.com/1200x/be/83/46/be834690e705945bd6493ea4cd49dc66.jpg', // Quản lý xây dựng
-    'https://i.pinimg.com/736x/82/eb/2b/82eb2b41654bf59360e6bc69448c8437.jpg', // MEP & Nội thất
+    'https://upgroup.com.vn/vnt_upload/service/10_2022/img1.jpg', // Thiết kế kiến trúc & kết cấu
+    'https://upgroup.com.vn/vnt_upload/service/10_2022/img4.jpg', // Thi công nhà xưởng
+    'https://upgroup.com.vn/vnt_upload/service/10_2022/lv3.jpg', // Phát triển đất đai
+    'https://upgroup.com.vn/vnt_upload/service/10_2022/img2.jpg', // Quản lý xây dựng
+    'https://upgroup.com.vn/vnt_upload/service/10_2022/lv5.jpg', // MEP & Nội thất
   ]
 
   // Dự án tiêu biểu
@@ -25,9 +25,9 @@ function App() {
     { id: 1, image: 'https://upgroup.com.vn/vnt_upload/project/chinh_tan/6_700x400.jpg', title: 'NHÀ XƯỞNG' },
     { id: 2, image: 'https://upgroup.com.vn/vnt_upload/project/SLP_Binh_Minh/7.png', title: 'LOGISTICS' },
     { id: 3, image: 'https://upgroup.com.vn/vnt_upload/project/hai_my/1.jpg', title: 'KÝ TÚC XÁ' },
-    { id: 4, image: 'https://i.pinimg.com/1200x/e5/cf/58/e5cf58423bf4f85ac36bc009d8123ff2.jpg', title: 'CAO ỐC' },
-    { id: 5, image: 'https://i.pinimg.com/1200x/d1/04/3a/d1043a737cfae2561512fe8564f44b00.jpg', title: 'CƠ ĐIỆN' },
-    { id: 6, image: 'https://i.pinimg.com/736x/bd/6e/c8/bd6ec81638dd2f4c581e44757966ea01.jpg', title: 'PHÒNG CHÁY CHỮA CHÁY' },
+    { id: 4, image: 'https://upgroup.com.vn/vnt_upload/project/10_2022/da4.jpg', title: 'CAO ỐC' },
+    { id: 5, image: 'https://upgroup.com.vn/vnt_upload/project/10_2022/da5.jpg', title: 'CƠ ĐIỆN' },
+    { id: 6, image: 'https://upgroup.com.vn/vnt_upload/project/10_2022/da6.jpg', title: 'PHÒNG CHÁY CHỮA CHÁY' },
   ]
 
   // Tin tức tiêu điểm (6 thẻ nổi bật)
@@ -89,7 +89,27 @@ function App() {
     { id: 30, name: 'Hyundai', logo: 'https://upgroup.com.vn/vnt_upload/partner/09_2022/slp_logo_2.jpg' },
   ]
 
-  const newsPerPage = 6 // Show 6 items in 3x2 grid
+  // Featured news now shows 1 item at a time
+  const [currentFeaturedNews, setCurrentFeaturedNews] = useState(0)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const nowMobile = window.innerWidth <= 768
+      setIsMobile((prevMobile) => {
+        // Reset to first page when switching between mobile and desktop
+        if (prevMobile !== nowMobile) {
+          setNewsPage(0)
+        }
+        return nowMobile
+      })
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const newsPerPage = isMobile ? 4 : 6 // Show 4 items on mobile (2x2), 6 items on desktop (3x2)
   const totalNewsPages = Math.ceil(otherNews.length / newsPerPage)
   
   // Auto-cycle for other news
@@ -99,26 +119,26 @@ function App() {
     }, 6000) // Auto cycle every 6 seconds
 
     return () => clearInterval(timer)
-  }, [totalNewsPages])
-  
-  // Featured news now shows 1 item at a time
-  const [currentFeaturedNews, setCurrentFeaturedNews] = useState(0)
+  }, [totalNewsPages, newsPerPage])
+
 
   const aboutImages = [
-    'https://i.pinimg.com/736x/0f/f9/a9/0ff9a9f8e9a6cf51152613ca376f3553.jpg', // Thiết kế kiến trúc & kết cấu
-    'https://i.pinimg.com/1200x/81/cf/e1/81cfe12dc1191fae348f7063c982129d.jpg', // Thi công nhà xưởng
-    'https://i.pinimg.com/1200x/7f/bc/d4/7fbcd4788bbdd0338cec2c7c1215efa3.jpg', // Phát triển đất đai
-    'https://i.pinimg.com/1200x/71/7f/8d/717f8d79bae1e8db4abdb90bc488b186.jpg', // Quản lý xây dựng
-    'https://i.pinimg.com/736x/46/2c/25/462c250fdc6ea936b2da4d8726f6aacf.jpg', // MEP & Nội thất
+    'https://upgroup.com.vn/vnt_upload/about/up_headquater/UP.jpg', // Thiết kế kiến trúc & kết cấu
+    'https://upgroup.com.vn/vnt_upload/weblink/aaimg2.jpg', // Thi công nhà xưởng
+    'https://upgroup.com.vn/vnt_upload/weblink/aaimg3.jpg', // Phát triển đất đai
+    'https://upgroup.com.vn/vnt_upload/weblink/aaimg4.jpg', // Quản lý xây dựng
+    'https://upgroup.com.vn/vnt_upload/weblink/aaimg5.jpg', // MEP & Nội thất
   ]
 
   const slides = [
-    { id: 1, image: 'https://i.pinimg.com/1200x/52/99/2b/52992bae521611d8e6f3ee1502387bd5.jpg', text: 'Xây dựng Ức Phát - An toàn - Tiến độ - Hiệu quả' },
-    { id: 2, image: 'https://i.pinimg.com/1200x/ca/e2/a0/cae2a09521a908e7efadd23b33884263.jpg', text: 'Xây dựng Ức Phát - Tôn trọng môi trường' },
-    { id: 3, image: 'https://i.pinimg.com/1200x/e5/2e/80/e52e8024aa4c6d37dc7424e6cb965397.jpg', text: 'Xây dựng Ức Phát - Chất lượng - Hiệu quả' },
-    { id: 4, image: 'https://i.pinimg.com/1200x/4a/92/b1/4a92b113112c103c8a4d7129c39c4c88.jpg', text: 'Xây dựng Ức Phát - Đội ngũ nhân sự chuyên nghiệp' },
-    { id: 5, image: 'https://i.pinimg.com/1200x/62/ac/c6/62acc6067630f3c63a92063da9decf5a.jpg', text: 'Xây dựng Ức Phát - Uy tín - Chất lượng' },
+    { id: 1, image: 'https://upgroup.com.vn/vnt_upload/weblink/banner.jpg', text: 'Xây dựng Ức Phát - An toàn - Tiến độ - Hiệu quả' },
+    { id: 2, image: 'https://upgroup.com.vn/vnt_upload/weblink/Banner_Site/Advanced_multitech.jpg', text: 'Xây dựng Ức Phát - Tôn trọng môi trường' },
+    { id: 3, image: 'https://upgroup.com.vn/vnt_upload/weblink/Banner_Site/Maxihub.jpg', text: 'Xây dựng Ức Phát - Chất lượng - Hiệu quả' },
+    { id: 4, image: 'https://upgroup.com.vn/vnt_upload/weblink/Banner_Site/7.png', text: 'Xây dựng Ức Phát - Đội ngũ nhân sự chuyên nghiệp' },
+    { id: 5, image: 'https://upgroup.com.vn/vnt_upload/weblink/Banner_Site/raw1.png', text: 'Xây dựng Ức Phát - Uy tín - Chất lượng' },
   ]
+
+
 
   // Helper functions for project information
   const getProjectDescription = (title: string): string => {
@@ -792,7 +812,9 @@ function App() {
               <div 
                 className="other-news-carousel"
                 style={{
-                  transform: `translateX(-${newsPage * 100}%)`
+                  transform: isMobile 
+                    ? `translateX(calc(-${newsPage * 100}% - ${newsPage * 15}px))`
+                    : `translateX(calc(-${newsPage * 100}% - ${newsPage * 20}px))`
                 }}
               >
                 {Array.from({ length: totalNewsPages }).map((_, pageIndex) => (
@@ -831,16 +853,6 @@ function App() {
               >
                 ‹
               </button>
-              
-              <div className="news-dots">
-                {Array.from({ length: totalNewsPages }).map((_, index) => (
-                  <button
-                    key={index}
-                    className={`news-dot ${index === newsPage ? 'active' : ''}`}
-                    onClick={() => setNewsPage(index)}
-                  />
-                ))}
-              </div>
               
               <button 
                 className="news-nav-btn" 
