@@ -891,7 +891,7 @@ function App() {
                             <div 
                               className="news-image" 
                               style={{
-                                backgroundImage: `url(${news.image || 'https://via.placeholder.com/300x180/4a90e2/ffffff?text=' + news.title})`
+                                backgroundImage: `url(${news.image || '' + news.title})`
                               }}
                             >
                               <div className="news-overlay"></div>
