@@ -237,6 +237,7 @@ function App() {
     const x = e.pageX - partnersCarouselRef.current.offsetLeft
     const walk = (x - startX) * 2
     partnersCarouselRef.current.scrollLeft = scrollLeft - walk
+ 
   }
 
   // Initialize carousel position at center
@@ -270,6 +271,7 @@ function App() {
         carousel.scrollLeft = scrollWidth / 2 - clientWidth / 2
       }
     }
+    
 
     carousel.addEventListener('scroll', handleScroll)
     return () => carousel.removeEventListener('scroll', handleScroll)
@@ -471,7 +473,7 @@ function App() {
                       <path d="M7 12l4-4 4 4 6-6" />
                     </svg>
                   </div>
-                  <div className="stat-number">+ 12 năm</div>
+                  <div className="stat-number">+12 năm</div>
                   <div className="stat-label">Hình thành và phát triển</div>
                 </div>
                 
@@ -660,7 +662,7 @@ function App() {
               <span className="panel-nav-text">Thiết kế kiến trúc & kết cấu</span>
             </div>
           </a>
-
+      
           <a 
             href="#" 
             className={`service-panel ${hoveredPanel === 1 ? 'active' : ''}`}
