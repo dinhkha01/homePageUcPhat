@@ -195,6 +195,7 @@ function App() {
       const carouselHeight = 0 // Height of carousel section
       const carouselEndPosition = headerHeight + carouselHeight
       
+      
       // Always show navbar when in carousel area
       if (currentScrollY < carouselEndPosition + 1) {
         setIsNavbarVisible(true)
@@ -209,8 +210,11 @@ function App() {
       }
       
       setLastScrollY(currentScrollY)
+      
     }
     
+
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
@@ -260,7 +264,6 @@ function App() {
       const scrollWidth = carousel.scrollWidth
       const clientWidth = carousel.clientWidth
       const scrollLeft = carousel.scrollLeft
-      
       // Nếu scroll đến gần cuối (trong vòng 50px), nhảy về giữa
       if (scrollLeft + clientWidth >= scrollWidth - 50) {
         carousel.scrollLeft = scrollWidth / 2 - clientWidth / 2
@@ -271,6 +274,7 @@ function App() {
         carousel.scrollLeft = scrollWidth / 2 - clientWidth / 2
       }
     }
+    
     
 
     carousel.addEventListener('scroll', handleScroll)
@@ -289,7 +293,9 @@ function App() {
                 <a href="#" className="logo-link">
                   <img src={`https://res.cloudinary.com/daug6bxma/image/upload/v1763103958/LOGO_UP_wwkovz.png`} alt="UP Construction Group" className="logo-img" />
                 </a>
-                <h1 className="logo-text">CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h1>
+             <div>
+               </div>
+                <h1 className="logo-text" >CÔNG TY TNHH TM DV XÂY DỰNG ỨC PHÁT</h1>
               </div>
               <div className="header-actions">
                 <div className="language-switcher">
@@ -355,6 +361,8 @@ function App() {
             </a>
           </div>
         </div>
+
+       
         
         <nav className="navbar mobile-hidden">
           <div className="container">
@@ -429,6 +437,7 @@ function App() {
             </button>
           ))}
         </div>
+      
         
         <button className="banner-prev" onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -441,6 +450,7 @@ function App() {
           </svg>
         </button>
       </section>
+
 
       {/* About Us Section */}
       <section className="about-section">
@@ -1228,6 +1238,9 @@ function App() {
                     <span className="contact-value">0251 3844 313</span>
                   </div>
                 </div>
+                <div>
+                  
+                </div>
                 
                 <div className="contact-item">
                   <div className="contact-icon">
@@ -1270,12 +1283,12 @@ function App() {
             
             {/* Social media cho mobile - hiển thị dưới copyright */}
             <div className="footer-social-mobile">
-              <a href="#" className="social-link" title="Facebook">
+              <a href="https://www.facebook.com/ucphatgroup/" className="social-link" title="Facebook">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
               </a>
-              <a href="#" className="social-link" title="YouTube">
+              <a href="https://www.youtube.com/@ucphatgroup" className="social-link" title="YouTube">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
